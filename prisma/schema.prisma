@@ -1,0 +1,57 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model user {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+
+  name        String
+  email       String   @unique
+  contact     String
+  state       String
+  city        String
+  postal_code String
+  street      String
+  number      String?
+  location    location @relation(fields: [locationId], references: [id], onDelete: Cascade)
+  locationId  Int      @unique
+}
+
+model location {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+
+  longitude Float
+  latitude  Float
+  user      user?
+  vendor    vendor?
+}
+
+model vendor {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+
+  name         String
+  email        String   @unique
+  contact      String
+  service_type String
+  state        String
+  city         String
+  postal_code  String
+  street       String
+  number       String?
+  location     location @relation(fields: [locationId], references: [id], onDelete: Cascade)
+  locationId   Int      @unique
+}
