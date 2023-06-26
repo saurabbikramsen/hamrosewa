@@ -35,3 +35,12 @@ export class UserDto {
 
   // locationId;
 }
+export class loginDto {
+  @IsEmail()
+  @IsNotEmpty()
+  email: string;
+
+  @IsString()
+  @IsNotEmpty()
+  password: string;
+}

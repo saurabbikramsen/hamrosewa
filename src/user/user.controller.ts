@@ -9,7 +9,7 @@ import {
   Put,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { UserDto } from './Dto';
+import { loginDto, UserDto } from './Dto';
 
 @Controller('user')
 export class UserController {
@@ -18,6 +18,11 @@ export class UserController {
   @Get()
   getUsers() {
     return this.userService.getUsers();
+  }
+
+  @Post('login')
+  loginUser(@Body() loginData: loginDto) {
+    return this.userService.loginUser(loginData);
   }
 
   @Post('add')

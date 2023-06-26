@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { GoogleMapsService } from '../googlemaps/googlemaps.service';
-import { UserDto } from './Dto';
+import { loginDto, UserDto } from './Dto';
 
 @Injectable()
 export class UserService {
@@ -24,6 +24,8 @@ export class UserService {
       },
     });
   }
+
+  async loginUser(loginDetails: loginDto) {}
 
   async addUser(userDetails: UserDto) {
     console.log(userDetails);

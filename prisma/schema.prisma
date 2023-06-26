@@ -11,24 +11,25 @@ datasource db {
 }
 
 model user {
-  id        Int      @id @default(autoincrement())
+  id        Int      @id @unique @default(autoincrement())
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
 
   name        String
-  email       String   @unique
+  email       String    @unique
   contact     String
   state       String
   city        String
   postal_code String
   street      String
   number      String?
-  location    location @relation(fields: [locationId], references: [id], onDelete: Cascade)
-  locationId  Int      @unique
+  location    location  @relation(fields: [locationId], references: [id], onDelete: Cascade)
+  locationId  Int       @unique
+  booking     booking[]
 }
 
 model location {
-  id        Int      @id @default(autoincrement())
+  id        Int      @id @unique @default(autoincrement())
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
 
@@ -38,13 +39,26 @@ model location {
   vendor    vendor?
 }
 
+model booking {
+  id        Int      @id @unique @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+
+  booked_date DateTime
+  status      String
+  user        user     @relation(fields: [userId], references: [id])
+  userId      Int
+  vendor      vendor   @relation(fields: [vendorId], references: [id])
+  vendorId    Int
+}
+
 model vendor {
-  id        Int      @id @default(autoincrement())
+  id        Int      @id @unique @default(autoincrement())
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
 
   name         String
-  email        String   @unique
+  email        String    @unique
   contact      String
   service_type String
   state        String
@@ -52,6 +66,7 @@ model vendor {
   postal_code  String
   street       String
   number       String?
-  location     location @relation(fields: [locationId], references: [id], onDelete: Cascade)
-  locationId   Int      @unique
+  location     location  @relation(fields: [locationId], references: [id], onDelete: Cascade)
+  locationId   Int       @unique
+  booking      booking[]
 }
