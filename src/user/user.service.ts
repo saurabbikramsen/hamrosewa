@@ -7,6 +7,7 @@ import {
 import { PrismaService } from '../prisma/prisma.service';
 import { GoogleMapsService } from '../googlemaps/googlemaps.service';
 import { loginDto, UserDto } from './Dto';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class UserService {
@@ -15,6 +16,7 @@ export class UserService {
   constructor(
     private readonly googleMaps: GoogleMapsService,
     private prisma: PrismaService,
+    private config: ConfigService,
   ) {}
 
   async getUsers() {
@@ -25,7 +27,14 @@ export class UserService {
     });
   }
 
-  async loginUser(loginDetails: loginDto) {}
+  async loginUser(loginDetails: loginDto) {
+    const user = await this.prisma.user.findFirst({
+      where: { email: loginDetails.email },
+    });
+    if (!user) {
+      throw new NotFoundException('User Not found');
+    }
+  }
 
   async addUser(userDetails: UserDto) {
     console.log(userDetails);
@@ -52,12 +61,7 @@ export class UserService {
         },
       });
     } else {
-      return {
-        throw: new HttpException(
-          'email already exists',
-          HttpStatus.BAD_REQUEST,
-        ),
-      };
+      throw new HttpException('email already exists', HttpStatus.BAD_REQUEST);
     }
   }
 
