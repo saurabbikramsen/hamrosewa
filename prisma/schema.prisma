@@ -17,6 +17,7 @@ model user {
 
   name        String
   email       String    @unique
+  password    String
   contact     String
   state       String
   city        String
@@ -59,6 +60,7 @@ model vendor {
 
   name         String
   email        String    @unique
+  password     String
   contact      String
   service_type String
   state        String

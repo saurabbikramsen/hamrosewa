@@ -10,7 +10,9 @@ import {
 } from '@nestjs/common';
 import { VendorService } from './vendor.service';
 import { VendorDto } from './Dto';
+import { ApiParam, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('vendor')
 @Controller('vendor')
 export class VendorController {
   constructor(private vendorService: VendorService) {}
@@ -26,6 +28,7 @@ export class VendorController {
   }
 
   @Put('update/:id')
+  @ApiParam({ name: 'id', type: 'number', description: 'Vendor Id' })
   updateVendor(
     @Param('id', ParseIntPipe) id: number,
     @Body() vendorDto: VendorDto,
@@ -34,6 +37,7 @@ export class VendorController {
   }
 
   @Delete('delete/:id')
+  @ApiParam({ name: 'id', type: 'number', description: 'Vendor Id' })
   deleteVendor(@Param('id', ParseIntPipe) id: number) {
     return this.vendorService.deleteVendor(id);
   }

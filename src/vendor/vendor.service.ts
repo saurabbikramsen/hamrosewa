@@ -53,6 +53,7 @@ export class VendorService {
             contact: vendorDetails.contact,
             service_type: vendorDetails.service_type,
             street: vendorDetails.street,
+            password: vendorDetails.password,
             state: vendorDetails.state,
             city: vendorDetails.city,
             postal_code: vendorDetails.postal_code,
@@ -66,7 +67,7 @@ export class VendorService {
         });
         return { msg: 'Vendor added Successfully' };
       } else {
-        throw new BadRequestException('EMAIL ALREADY EXISTS');
+        throw new BadRequestException('Email already exists');
       }
     } catch (error) {
       throw error;
