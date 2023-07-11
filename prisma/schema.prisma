@@ -51,6 +51,7 @@ model booking {
   userId      Int
   vendor      vendor   @relation(fields: [vendorId], references: [id])
   vendorId    Int
+  payment     payment?
 }
 
 model vendor {
@@ -78,7 +79,19 @@ model services {
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
 
-  name        String
+  name        String @unique
   image_url   String
   description String
+}
+
+model payment {
+  id        Int      @id @unique @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+
+  amount Int?
+  status String
+
+  booking   booking @relation(fields: [bookingId], references: [id])
+  bookingId Int     @unique
 }

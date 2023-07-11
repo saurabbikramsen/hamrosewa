@@ -7,6 +7,7 @@ import { ConfigModule } from '@nestjs/config';
 import { VendorModule } from './vendor/vendor.module';
 import { BookingsModule } from './bookings/bookings.module';
 import { JwtModule } from '@nestjs/jwt';
+import { ServicesModule } from './services/services.module';
 
 @Global()
 @Module({
@@ -19,6 +20,7 @@ import { JwtModule } from '@nestjs/jwt';
     }),
     VendorModule,
     BookingsModule,
+    ServicesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
