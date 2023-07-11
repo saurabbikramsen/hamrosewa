@@ -22,6 +22,7 @@ export class MinioClientService {
     if (
       !(
         file.mimetype.includes('jpeg') ||
+        file.mimetype.includes('JPG') ||
         file.mimetype.includes('png') ||
         file.mimetype.includes('heic')
       )

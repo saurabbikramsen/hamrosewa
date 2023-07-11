@@ -8,6 +8,7 @@ import { VendorModule } from './vendor/vendor.module';
 import { BookingsModule } from './bookings/bookings.module';
 import { JwtModule } from '@nestjs/jwt';
 import { ServicesModule } from './services/services.module';
+import { MinioClientModule } from './minio-client/minio-client.module';
 
 @Global()
 @Module({
@@ -20,6 +21,7 @@ import { ServicesModule } from './services/services.module';
     }),
     VendorModule,
     BookingsModule,
+    MinioClientModule,
     ServicesModule,
   ],
   controllers: [AppController],
