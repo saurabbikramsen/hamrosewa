@@ -4279,6 +4279,11 @@ nestjs-minio-client@^2.0.0:
     reflect-metadata "^0.1.13"
     rxjs "^7.5.6"
 
+nestjs-prisma-pagination@^1.0.23:
+  version "1.0.23"
+  resolved "https://registry.yarnpkg.com/nestjs-prisma-pagination/-/nestjs-prisma-pagination-1.0.23.tgz#25efbf23c69759ce57266aaa4a57ee845b28dafb"
+  integrity sha512-/cBfSsKJCAU6e37I3oN1YrWFQ8TJGjGA0fTWTVFkR+hdgXkNZXeTQqsMIOX7smVT3Vgg+6xM2kMctDt+YG1Ybw==
+
 node-abort-controller@^3.0.1:
   version "3.1.1"
   resolved "https://registry.yarnpkg.com/node-abort-controller/-/node-abort-controller-3.1.1.tgz#a94377e964a9a37ac3976d848cb5c765833b8548"

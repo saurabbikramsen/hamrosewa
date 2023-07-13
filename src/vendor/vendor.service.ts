@@ -14,6 +14,17 @@ export class VendorService {
     private prisma: PrismaService,
   ) {}
 
+  async getonly(take, skip, searchKey) {
+    const vendors = await this.prisma.vendor.findMany({
+      where: { name: { contains: searchKey } },
+      skip,
+      take,
+    });
+    const count = await this.prisma.vendor.count({
+      where: { name: { contains: searchKey } },
+    });
+    return { vendors, count };
+  }
   async getVendors() {
     return this.prisma.vendor.findMany({
       include: {

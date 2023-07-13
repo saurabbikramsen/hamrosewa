@@ -7,10 +7,11 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  Query,
 } from '@nestjs/common';
 import { VendorService } from './vendor.service';
 import { VendorDto } from './Dto';
-import { ApiParam, ApiTags } from '@nestjs/swagger';
+import { ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('vendor')
 @Controller('vendor')
@@ -20,6 +21,45 @@ export class VendorController {
   @Get()
   getVendors() {
     return this.vendorService.getVendors();
+  }
+
+  @ApiQuery({ name: 'page', required: false, type: Number })
+  @ApiQuery({ name: 'pageSize', required: false, type: Number })
+  @ApiQuery({ name: 'searchKey', required: false, type: String })
+  @Get('get')
+  async getOnly(
+    @Query('page', ParseIntPipe) page = 1,
+    @Query('pageSize', ParseIntPipe) pageSize = 50,
+    @Query('searchKey') searchKey = '',
+  ) {
+    const take = pageSize ? pageSize : 5;
+    const skip = page ? (page - 1) * pageSize : 0;
+
+    const result = await this.vendorService.getonly(take, skip, searchKey);
+
+    const totalPages = Math.ceil(result.count / take);
+
+    const nextPage =
+      page < totalPages
+        ? `vendor/?page=${page + 1}&pageSize=${take}&searchKey=${searchKey}`
+        : null;
+
+    const prevPage =
+      page > 1
+        ? `vendor/?page=${page - 1}&pageSize=${take}&searchKey=${searchKey}`
+        : null;
+
+    return {
+      data: result.vendors,
+      pageInfo: {
+        count: result.count,
+        currentPage: page,
+        pageSize: take,
+        totalPages,
+        nextPage,
+        prevPage,
+      },
+    };
   }
 
   @Post('add')
