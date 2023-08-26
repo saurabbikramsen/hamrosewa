@@ -1,8 +1,18 @@
-import { IsEmail, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import {
+  IsEmail,
+  IsEnum,
+  IsNotEmpty,
+  IsNumber,
+  IsString,
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { Expose, Transform } from 'class-transformer';
+import { StateEnum } from '../../Enums/enum';
 
 export class VendorDto {
   @ApiProperty()
+  @Expose()
+  @Transform(({ value }) => value.toUpperCase())
   @IsString()
   @IsNotEmpty()
   name: string;
@@ -28,9 +38,9 @@ export class VendorDto {
   service_type: string;
 
   @ApiProperty()
-  @IsString()
+  @IsEnum(StateEnum)
   @IsNotEmpty()
-  state: string;
+  state: StateEnum;
 
   @ApiProperty()
   @IsString()
@@ -63,4 +73,14 @@ export class VendorDto {
   lng: number;
 
   // locationId;
+}
+
+export class VendorLoginDto {
+  @IsEmail()
+  @IsNotEmpty()
+  email: string;
+
+  @IsString()
+  @IsNotEmpty()
+  password: string;
 }

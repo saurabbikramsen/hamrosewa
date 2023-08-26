@@ -7,12 +7,13 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  Query,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
 import { ServicesService } from './services.service';
 import { ServicesDto } from './Dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiQuery, ApiTags } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { BufferedFile } from '../minio-client/file.model';
 
@@ -21,6 +22,20 @@ import { BufferedFile } from '../minio-client/file.model';
 export class ServicesController {
   constructor(private serviceService: ServicesService) {}
 
+  @ApiQuery({ name: 'searchKey', required: false, type: String })
+  @ApiQuery({ name: 'userId', required: true, type: Number })
+  @Get('search')
+  getSearchService(
+    @Query('searchKey') searchKey = '',
+    @Query('userId', ParseIntPipe) userId,
+  ) {
+    return this.serviceService.getSearchService(searchKey, userId);
+  }
+
+  @Get('/interaction')
+  getInteraction() {
+    return this.serviceService.getInteractions();
+  }
   @Get()
   getServices() {
     return this.serviceService.getServices();
@@ -46,7 +61,7 @@ export class ServicesController {
   }
 
   @Delete(':id')
-  deleteService(@Param('id', ParseIntPipe) id: number) {
+  deleteService(@Param('id') id: number) {
     return this.serviceService.deleteService(id);
   }
 }

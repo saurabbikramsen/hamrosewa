@@ -125,14 +125,27 @@ export class UserService {
     }
     const co_ordinates = await this.getLocation(userDetails);
 
-    await this.prisma.location.update({
+    const location = await this.prisma.location.update({
       where: { id: user.locationId },
       data: { longitude: co_ordinates.lng, latitude: co_ordinates.lat },
     });
     await this.prisma.user.update({
       where: { id },
       data: {
-        ...userDetails,
+        name: userDetails.name,
+        email: userDetails.email,
+        contact: userDetails.contact,
+        street: userDetails.street,
+        state: userDetails.state,
+        password: user.password,
+        city: userDetails.city,
+        postal_code: userDetails.postal_code,
+        number: userDetails.number,
+        location: {
+          connect: {
+            id: location.id,
+          },
+        },
       },
     });
     return {

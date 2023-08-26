@@ -11,12 +11,15 @@ import {
 import { BookingsService } from './bookings.service';
 import { BookingsDto } from './Dto';
 import { ApiTags } from '@nestjs/swagger';
+import { SkipThrottle } from '@nestjs/throttler';
 
+@SkipThrottle()
 @ApiTags('Bookings')
 @Controller('bookings')
 export class BookingsController {
   constructor(private bookingService: BookingsService) {}
 
+  @SkipThrottle(false)
   @Get()
   getBookings() {
     return this.bookingService.getBookings();

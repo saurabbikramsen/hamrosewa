@@ -13,9 +13,32 @@ export class BookingsService {
   }
 
   async addBooking(bookingDetails: BookingsDto) {
+    const vendor = await this.prisma.vendor.findFirst({
+      where: { id: bookingDetails.vendor_id },
+    });
+    const service = await this.prisma.services.findFirst({
+      where: { name: { contains: vendor.service_type } },
+    });
+    await this.prisma.interaction.create({
+      data: {
+        service: {
+          connect: {
+            id: service.id,
+          },
+        },
+        user: {
+          connect: {
+            id: bookingDetails.user_id,
+          },
+        },
+        interaction_type: 'booking',
+      },
+    });
+
     return this.prisma.booking.create({
       data: {
-        ...bookingDetails,
+        booked_date: bookingDetails.booked_date,
+        status: bookingDetails.status,
         user: {
           connect: {
             id: bookingDetails.user_id,

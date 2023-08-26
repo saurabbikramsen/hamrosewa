@@ -8,10 +8,14 @@ import {
   Post,
   Put,
   Query,
+  UseInterceptors,
+  UsePipes,
 } from '@nestjs/common';
 import { VendorService } from './vendor.service';
 import { VendorDto } from './Dto';
 import { ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ErrorHandlingPipes } from '../Pipes/lowerCasePipe';
+import { ResponseInspector } from '../interceptor/response_interceptor ';
 
 @ApiTags('vendor')
 @Controller('vendor')
@@ -19,6 +23,7 @@ export class VendorController {
   constructor(private vendorService: VendorService) {}
 
   @Get()
+  @UseInterceptors(ResponseInspector)
   getVendors() {
     return this.vendorService.getVendors();
   }
@@ -32,10 +37,11 @@ export class VendorController {
     @Query('pageSize', ParseIntPipe) pageSize = 50,
     @Query('searchKey') searchKey = '',
   ) {
+    console.log(searchKey);
     const take = pageSize ? pageSize : 5;
     const skip = page ? (page - 1) * pageSize : 0;
 
-    const result = await this.vendorService.getonly(take, skip, searchKey);
+    const result = await this.vendorService.getOnly(take, skip, searchKey);
 
     const totalPages = Math.ceil(result.count / take);
 
@@ -63,12 +69,14 @@ export class VendorController {
   }
 
   @Post('add')
+  @UsePipes(ErrorHandlingPipes)
   addVendor(@Body() vendorDto: VendorDto) {
     return this.vendorService.addVendor(vendorDto);
   }
 
   @Put('update/:id')
   @ApiParam({ name: 'id', type: 'number', description: 'Vendor Id' })
+  @UsePipes(ErrorHandlingPipes)
   updateVendor(
     @Param('id', ParseIntPipe) id: number,
     @Body() vendorDto: VendorDto,

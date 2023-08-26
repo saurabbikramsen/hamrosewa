@@ -1,5 +1,12 @@
-import { IsEmail, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import {
+  IsEmail,
+  IsEnum,
+  IsNotEmpty,
+  IsNumber,
+  IsString,
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { StateEnum } from '../../Enums/enum';
 
 export class UserDto {
   @ApiProperty()
@@ -23,9 +30,9 @@ export class UserDto {
   contact: string;
 
   @ApiProperty()
-  @IsString()
+  @IsEnum(StateEnum)
   @IsNotEmpty()
-  state: string;
+  state: StateEnum;
 
   @ApiProperty()
   @IsString()
