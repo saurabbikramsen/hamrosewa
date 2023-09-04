@@ -25,6 +25,20 @@ export class UserController {
     return this.userService.getUsers();
   }
 
+  @Get('/:id')
+  getUser(@Param('id', ParseIntPipe) id: number) {
+    return this.userService.getUser(id);
+  }
+  @Get('userPayment/:id')
+  async userPayments(@Param('id', ParseIntPipe) id: number) {
+    return this.userService.getUserPayment(id);
+  }
+  @Get('userBookings/:id')
+  getUserBookings(@Param('id', ParseIntPipe) id: number) {
+    console.log('aaxa ta bookings ma');
+    return this.userService.getUserBookings(id);
+  }
+
   @Post('login')
   @ApiResponse({ type: LoginResponseDto })
   loginUser(@Body() loginData: loginDto) {

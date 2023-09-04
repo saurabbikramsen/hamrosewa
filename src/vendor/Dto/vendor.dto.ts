@@ -38,6 +38,11 @@ export class VendorDto {
   service_type: string;
 
   @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  description: string;
+
+  @ApiProperty()
   @IsEnum(StateEnum)
   @IsNotEmpty()
   state: StateEnum;
@@ -65,12 +70,12 @@ export class VendorDto {
   @ApiProperty()
   @IsNumber()
   @IsNotEmpty()
-  lat: number;
+  lat: any;
 
   @ApiProperty()
   @IsNumber()
   @IsNotEmpty()
-  lng: number;
+  lng: any;
 
   // locationId;
 }

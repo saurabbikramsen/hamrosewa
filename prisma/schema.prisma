@@ -6,14 +6,14 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
 model admin {
   id        Int      @id @unique @default(autoincrement())
   createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   name     String
   email    String @unique
@@ -24,12 +24,12 @@ model admin {
 model user {
   id        Int      @id @unique @default(autoincrement())
   createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   name        String
   email       String        @unique
   password    String
-  contact     String
+  contact     String        @unique
   state       String
   city        String
   postal_code String
@@ -39,26 +39,54 @@ model user {
   locationId  Int           @unique
   booking     booking[]
   interaction interaction[]
+  payment     payment[]
+}
+
+model vendor {
+  id        Int      @id @unique @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name              String
+  email             String    @unique
+  password          String
+  contact           String    @unique
+  service_type      String
+  state             String
+  city              String
+  postal_code       String
+  street            String
+  description       String?   @db.VarChar(5000)
+  number            String?
+  location          location  @relation(fields: [locationId], references: [id], onDelete: Cascade)
+  locationId        Int       @unique
+  rating            Float?
+  visited_frequency Int       @default(0)
+  booking           booking[]
+  payment           payment[]
 }
 
 model location {
   id        Int      @id @unique @default(autoincrement())
   createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   longitude Float
   latitude  Float
   user      user?
   vendor    vendor?
+
+  // @@index([latitude, longitude], name: "location_idx", type: Gist)
 }
 
 model booking {
   id        Int      @id @unique @default(autoincrement())
   createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  booked_date String
+  booked_date DateTime
   status      String
+  description String
   user        user[]
   vendor      vendor[]
   // user        user     @relation(fields: [userId], references: [id])
@@ -71,7 +99,7 @@ model booking {
 model interaction {
   id        Int      @id @unique @default(autoincrement())
   createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   interaction_type String
   user             user[]
@@ -83,30 +111,10 @@ model interaction {
   // serviceId Int
 }
 
-model vendor {
-  id        Int      @id @unique @default(autoincrement())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
-
-  name         String
-  email        String    @unique
-  password     String
-  contact      String
-  service_type String
-  state        String
-  city         String
-  postal_code  String
-  street       String
-  number       String?
-  location     location  @relation(fields: [locationId], references: [id], onDelete: Cascade)
-  locationId   Int       @unique
-  booking      booking[]
-}
-
 model services {
   id        Int      @id @unique @default(autoincrement())
   createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   name        String        @unique
   image_url   String
@@ -117,11 +125,13 @@ model services {
 model payment {
   id        Int      @id @unique @default(autoincrement())
   createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  amount Int?
+  amount Int    @default(0)
   status String
 
-  booking   booking @relation(fields: [bookingId], references: [id])
-  bookingId Int     @unique
+  booking   booking  @relation(fields: [bookingId], references: [id])
+  bookingId Int      @unique
+  vendor    vendor[]
+  user      user[]
 }

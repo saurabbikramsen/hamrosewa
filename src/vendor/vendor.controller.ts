@@ -24,7 +24,7 @@ export class VendorController {
 
   @Get()
   @UseInterceptors(ResponseInspector)
-  getVendors() {
+  getVendors(): Promise<any> {
     return this.vendorService.getVendors();
   }
 
@@ -37,7 +37,6 @@ export class VendorController {
     @Query('pageSize', ParseIntPipe) pageSize = 50,
     @Query('searchKey') searchKey = '',
   ) {
-    console.log(searchKey);
     const take = pageSize ? pageSize : 5;
     const skip = page ? (page - 1) * pageSize : 0;
 
@@ -68,6 +67,10 @@ export class VendorController {
     };
   }
 
+  @Get('/:id')
+  getVendorInfo(@Param('id', ParseIntPipe) id: number) {
+    return this.vendorService.getVendorInfo(id);
+  }
   @Post('add')
   @UsePipes(ErrorHandlingPipes)
   addVendor(@Body() vendorDto: VendorDto) {

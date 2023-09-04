@@ -3,14 +3,8 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class BookingsDto {
   @ApiProperty()
-  @IsString()
   @IsNotEmpty()
-  booked_date: string;
-
-  @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
-  status: string;
+  booked_date: Date;
 
   @ApiProperty()
   @IsNumber()
@@ -21,4 +15,15 @@ export class BookingsDto {
   @IsNumber()
   @IsNotEmpty()
   vendor_id: number;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsString()
+  description: string;
+}
+export class AcceptBookingDto {
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  status: string;
 }

@@ -9,7 +9,6 @@ import { PrismaService } from '../prisma/prisma.service';
 import { GoogleMapsService } from '../googlemaps/googlemaps.service';
 import { loginDto, UserDto } from './Dto';
 import { ConfigService } from '@nestjs/config';
-
 import * as argon from 'argon2';
 import { JwtService } from '@nestjs/jwt';
 
@@ -24,6 +23,43 @@ export class UserService {
     private jwt: JwtService,
   ) {}
 
+  async getUser(id: number) {
+    return this.prisma.user.findFirst({
+      where: { id },
+      include: {
+        booking: true,
+        location: true,
+      },
+    });
+  }
+
+  async getUserPayment(id: number) {
+    console.log(id);
+    return this.prisma.user.findFirst({
+      where: { id },
+      include: {
+        payment: { include: { booking: { include: { vendor: true } } } },
+      },
+    });
+  }
+  async getUserBookings(id: number) {
+    const user = await this.prisma.user.findFirst({
+      where: { id },
+      include: {
+        booking: { include: { vendor: true, payment: true } },
+      },
+    });
+    const bookings = user.booking.filter((booking) => {
+      if (
+        booking.status == 'pending' ||
+        (booking.status == 'accepted' && booking.payment.status != 'Paid')
+      ) {
+        return booking;
+      }
+    });
+    console.log(bookings);
+    return bookings;
+  }
   async getUsers() {
     return this.prisma.user.findMany({
       include: {
@@ -69,7 +105,7 @@ export class UserService {
     });
     if (!user) {
       if (userDetails.lat === -82.2196534 && userDetails.lng === 56.81587) {
-        const co_ordinates = await this.getLocation(userDetails);
+        const co_ordinates: any = await this.getLocation(userDetails);
         location = await this.prisma.location.create({
           data: {
             longitude: co_ordinates.lng,
@@ -129,6 +165,7 @@ export class UserService {
       where: { id: user.locationId },
       data: { longitude: co_ordinates.lng, latitude: co_ordinates.lat },
     });
+
     await this.prisma.user.update({
       where: { id },
       data: {

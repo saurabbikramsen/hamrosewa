@@ -12,7 +12,6 @@ async function bootstrap() {
     .setTitle('Hamro Sewa')
     .setDescription('Easy Fast services')
     .setVersion('1.0')
-    // .addSecurity('bearer', { type: 'openIdConnect' })
     .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, config);

@@ -5,11 +5,12 @@ import {
   Get,
   Param,
   ParseIntPipe,
+  Patch,
   Post,
   Put,
 } from '@nestjs/common';
 import { BookingsService } from './bookings.service';
-import { BookingsDto } from './Dto';
+import { AcceptBookingDto, BookingsDto } from './Dto';
 import { ApiTags } from '@nestjs/swagger';
 import { SkipThrottle } from '@nestjs/throttler';
 
@@ -25,7 +26,14 @@ export class BookingsController {
     return this.bookingService.getBookings();
   }
 
-  @Post('add')
+  @Patch('accept/:id')
+  acceptBooking(
+    @Body() acceptBookingDto: AcceptBookingDto,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return this.bookingService.acceptBooking(id, acceptBookingDto);
+  }
+  @Post()
   addBooking(@Body() bookingsDto: BookingsDto) {
     return this.bookingService.addBooking(bookingsDto);
   }

@@ -20,6 +20,16 @@ export class VendorService {
     private jwt: JwtService,
   ) {}
 
+  async getVendorInfo(id: number) {
+    const vendor = await this.prisma.vendor.findUnique({ where: { id } });
+
+    const vf = vendor.visited_frequency + 1;
+    return this.prisma.vendor.update({
+      where: { id },
+      data: { visited_frequency: vf },
+    });
+  }
+
   async login(loginDetails: VendorLoginDto) {
     const vendor = await this.prisma.vendor.findFirst({
       where: { email: loginDetails.email },
@@ -59,16 +69,11 @@ export class VendorService {
     return { vendors, count };
   }
   async getVendors() {
-    return this.prisma.vendor.findMany({
-      include: {
-        location: true,
-      },
-    });
+    return this.prisma.vendor.findMany({ include: { location: true } });
   }
 
   async addVendor(vendorDetails: VendorDto) {
     try {
-      console.log(vendorDetails);
       let location: any = {};
       const vendor = await this.prisma.vendor.findFirst({
         where: { email: vendorDetails.email },
@@ -78,13 +83,15 @@ export class VendorService {
           vendorDetails.lat === -82.2196534 &&
           vendorDetails.lng === 56.81587
         ) {
-          const co_ordinates = await this.getLocation(vendorDetails);
-          location = await this.prisma.location.create({
-            data: {
-              longitude: co_ordinates.lng,
-              latitude: co_ordinates.lat,
-            },
-          });
+          const co_ordinates: any = await this.getLocation(vendorDetails);
+          // location = await this.prisma.location.create({
+          //   data: {
+          //     longitude: co_ordinates.lng,
+          //     latitude: co_ordinates.lat,
+          //   },
+          // });
+          location = await this.prisma
+            .$executeRaw`insert into location (latitude, longitude) values (${co_ordinates.lat}, ${co_ordinates.lng})`;
         } else {
           location = await this.prisma.location.create({
             data: { longitude: vendorDetails.lng, latitude: vendorDetails.lat },
@@ -103,6 +110,7 @@ export class VendorService {
             city: vendorDetails.city,
             postal_code: vendorDetails.postal_code,
             number: vendorDetails.number,
+            description: vendorDetails.description,
             location: {
               connect: {
                 id: location.id,
@@ -136,12 +144,15 @@ export class VendorService {
     if (!vendor) {
       throw new NotFoundException('vendor not found');
     }
-    const co_ordinates = await this.getLocation(vendorDetails);
+    const co_ordinates: any = await this.getLocation(vendorDetails);
 
-    await this.prisma.location.update({
-      where: { id: vendor.locationId },
-      data: { longitude: co_ordinates.lng, latitude: co_ordinates.lat },
-    });
+    // await this.prisma.location.update({
+    //   where: { id: vendor.locationId },
+    //   data: { longitude: co_ordinates.lng, latitude: co_ordinates.lat },
+    // });
+    await this.prisma
+      .$executeRaw`Update location set longitude=${co_ordinates.lng} latitude=${co_ordinates.lat} where id=${vendor.locationId}`;
+
     return this.prisma.vendor.update({
       where: { id },
       data: {

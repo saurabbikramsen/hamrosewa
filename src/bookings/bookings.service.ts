@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { BookingsDto } from './Dto';
+import { AcceptBookingDto, BookingsDto } from './Dto';
 
 @Injectable()
 export class BookingsService {
@@ -17,7 +17,7 @@ export class BookingsService {
       where: { id: bookingDetails.vendor_id },
     });
     const service = await this.prisma.services.findFirst({
-      where: { name: { contains: vendor.service_type } },
+      where: { name: vendor.service_type },
     });
     await this.prisma.interaction.create({
       data: {
@@ -35,10 +35,11 @@ export class BookingsService {
       },
     });
 
-    return this.prisma.booking.create({
+    const booking = await this.prisma.booking.create({
       data: {
         booked_date: bookingDetails.booked_date,
-        status: bookingDetails.status,
+        description: bookingDetails.description,
+        status: 'pending',
         user: {
           connect: {
             id: bookingDetails.user_id,
@@ -51,6 +52,15 @@ export class BookingsService {
         },
       },
     });
+    await this.prisma.payment.create({
+      data: {
+        status: 'undefined',
+        booking: { connect: { id: booking.id } },
+        user: { connect: { id: bookingDetails.user_id } },
+        vendor: { connect: { id: bookingDetails.vendor_id } },
+      },
+    });
+    return { msg: 'Booking Added Successfully' };
   }
 
   async updateBooking(id, bookingDetails: BookingsDto) {
@@ -63,6 +73,20 @@ export class BookingsService {
       where: { id },
       data: {
         ...bookingDetails,
+      },
+    });
+  }
+
+  async acceptBooking(id: number, acceptBookingDetails: AcceptBookingDto) {
+    const booking = await this.prisma.booking.findUnique({ where: { id } });
+    if (!booking) {
+      throw new NotFoundException('booking not found');
+    }
+
+    return this.prisma.booking.update({
+      where: { id },
+      data: {
+        ...acceptBookingDetails,
       },
     });
   }

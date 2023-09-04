@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "vendor" ALTER COLUMN "rating" SET DATA TYPE DOUBLE PRECISION;

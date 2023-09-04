@@ -27,7 +27,7 @@ export class ServicesController {
   @Get('search')
   getSearchService(
     @Query('searchKey') searchKey = '',
-    @Query('userId', ParseIntPipe) userId,
+    @Query('userId', ParseIntPipe) userId: number,
   ) {
     return this.serviceService.getSearchService(searchKey, userId);
   }
