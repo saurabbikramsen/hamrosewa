@@ -38,6 +38,7 @@ export class ServicesController {
   }
   @Get()
   getServices() {
+    console.log('hello get services');
     return this.serviceService.getServices();
   }
 
@@ -61,7 +62,8 @@ export class ServicesController {
   }
 
   @Delete(':id')
-  deleteService(@Param('id') id: number) {
+  deleteService(@Param('id', ParseIntPipe) id: number) {
+    console.log('k xaa');
     return this.serviceService.deleteService(id);
   }
 }

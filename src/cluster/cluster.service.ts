@@ -64,8 +64,12 @@ export class ClusterService {
       sumBiBi += B[i] * B[i];
     }
 
-    // Calculate and return the cosine similarity
-    return sumAiBi / Math.sqrt(sumAiAi * sumBiBi);
+    const calc = sumAiBi / Math.sqrt(sumAiAi * sumBiBi);
+    if (isNaN(calc)) {
+      return 0;
+    }
+    // Calculate and return the cosine similarity return calc:
+    return calc;
   }
   async addProfileViews(userId: number, vendorId: number) {
     await this.prisma.profileViews.upsert({
@@ -84,12 +88,12 @@ export class ClusterService {
     // create a matrix
     const allUsers = await this.prisma.user.findMany({
       orderBy: {
-        createdAt: 'desc',
+        id: 'asc',
       },
     });
     const allVendors = await this.prisma.vendor.findMany({
       orderBy: {
-        createdAt: 'desc',
+        id: 'asc',
       },
     });
     const watchedMatrix: number[][] = [];

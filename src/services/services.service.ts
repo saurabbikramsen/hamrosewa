@@ -78,7 +78,12 @@ export class ServicesService {
     return { msg: 'service updated successfully' };
   }
 
-  async deleteService(id) {
-    throw new NotFoundException('service not found');
+  async deleteService(id: number) {
+    const service = await this.prisma.services.findFirst({ where: { id } });
+    if (!service) {
+      throw new NotFoundException('service not found');
+    }
+    await this.prisma.services.delete({ where: { id } });
+    return { message: 'service deleted successfully' };
   }
 }
