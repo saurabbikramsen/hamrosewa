@@ -26,20 +26,25 @@ model user {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  name        String
-  email       String        @unique
-  password    String
-  contact     String        @unique
-  state       String
-  city        String
-  postal_code String
-  street      String
-  number      String?
-  location    location      @relation(fields: [locationId], references: [id], onDelete: Cascade)
-  locationId  Int           @unique
-  booking     booking[]
-  interaction interaction[]
-  payment     payment[]
+  name            String
+  email           String         @unique
+  password        String
+  contact         String         @unique
+  state           String
+  city            String
+  postal_code     String
+  street          String
+  number          String?
+  location        location       @relation(fields: [locationId], references: [id], onDelete: Cascade)
+  locationId      Int            @unique
+  booking         booking[]
+  interaction     interaction[]
+  payment         payment[]
+  similarMainUser SimilarUser?   @relation("SimilarMainUser")
+  profileViews    ProfileViews[]
+  similarUsers    SimilarUser[]  @relation("SimilarUser")
+
+  @@index([id, email])
 }
 
 model vendor {
@@ -48,22 +53,36 @@ model vendor {
   updatedAt DateTime @updatedAt
 
   name              String
-  email             String    @unique
+  email             String         @unique
   password          String
-  contact           String    @unique
+  contact           String         @unique
   service_type      String
   state             String
   city              String
   postal_code       String
   street            String
-  description       String?   @db.VarChar(5000)
+  description       String?        @db.VarChar(5000)
   number            String?
-  location          location  @relation(fields: [locationId], references: [id], onDelete: Cascade)
-  locationId        Int       @unique
+  location          location       @relation(fields: [locationId], references: [id], onDelete: Cascade)
+  locationId        Int            @unique
   rating            Float?
-  visited_frequency Int       @default(0)
+  visited_frequency Int            @default(0)
   booking           booking[]
   payment           payment[]
+  ProfileViews      ProfileViews[]
+
+  @@index([id, email])
+}
+
+model ProfileViews {
+  id       Int    @id @default(autoincrement())
+  count    Int    @default(1)
+  userId   Int
+  vendorId Int
+  user     user   @relation(fields: [userId], references: [id])
+  vendor   vendor @relation(fields: [vendorId], references: [id])
+
+  @@unique([userId, vendorId])
 }
 
 model location {
@@ -134,4 +153,13 @@ model payment {
   bookingId Int      @unique
   vendor    vendor[]
   user      user[]
+}
+
+model SimilarUser {
+  id           Int    @id @default(autoincrement())
+  mainUserId   Int
+  mainUser     user   @relation("SimilarMainUser", fields: [mainUserId], references: [id])
+  similarUsers user[] @relation("SimilarUser")
+
+  @@unique([mainUserId])
 }

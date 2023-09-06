@@ -16,12 +16,14 @@ import { APP_GUARD } from '@nestjs/core';
 import { CollaborativeFilteringService } from './collaborative-filtering/collaborative-filtering.service';
 import { RecommendationModule } from './recommendation/recommendation.module';
 import { PaymentModule } from './payment/payment.module';
+import { ClusterModule } from './cluster/cluster.module';
 
 @Global()
 @Module({
   imports: [
     PrismaModule,
     UserModule,
+    ClusterModule,
     JwtModule,
     ConfigModule.forRoot({
       isGlobal: true,

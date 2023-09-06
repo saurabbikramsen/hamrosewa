@@ -67,9 +67,12 @@ export class VendorController {
     };
   }
 
-  @Get('/:id')
-  getVendorInfo(@Param('id', ParseIntPipe) id: number) {
-    return this.vendorService.getVendorInfo(id);
+  @Get('detail')
+  getVendorInfo(
+    @Query('userId', ParseIntPipe) userId: number,
+    @Query('vendorId', ParseIntPipe) vendorId: number,
+  ) {
+    return this.vendorService.getVendorInfo(userId, vendorId);
   }
   @Post('add')
   @UsePipes(ErrorHandlingPipes)

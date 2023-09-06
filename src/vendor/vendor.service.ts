@@ -10,6 +10,7 @@ import { VendorDto, VendorLoginDto } from './Dto';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as argon from 'argon2';
+import { ClusterService } from '../cluster/cluster.service';
 
 @Injectable()
 export class VendorService {
@@ -17,15 +18,18 @@ export class VendorService {
     private readonly googleMaps: GoogleMapsService,
     private prisma: PrismaService,
     private config: ConfigService,
+    private cluster: ClusterService,
     private jwt: JwtService,
   ) {}
 
-  async getVendorInfo(id: number) {
-    const vendor = await this.prisma.vendor.findUnique({ where: { id } });
-
+  async getVendorInfo(userId: number, vendorId: number) {
+    const vendor = await this.prisma.vendor.findUnique({
+      where: { id: vendorId },
+    });
+    await this.cluster.addProfileViews(userId, vendorId);
     const vf = vendor.visited_frequency + 1;
     return this.prisma.vendor.update({
-      where: { id },
+      where: { id: vendorId },
       data: { visited_frequency: vf },
     });
   }
