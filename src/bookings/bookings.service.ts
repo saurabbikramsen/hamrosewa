@@ -83,12 +83,28 @@ export class BookingsService {
       throw new NotFoundException('booking not found');
     }
 
-    return this.prisma.booking.update({
+    await this.prisma.booking.update({
       where: { id },
       data: {
         ...acceptBookingDetails,
       },
     });
+    return { message: 'Booking accepted for ' + booking.booked_date };
+  }
+
+  async cancelBooking(id: number, cancelBookingDetails: AcceptBookingDto) {
+    const booking = await this.prisma.booking.findUnique({ where: { id } });
+    if (!booking) {
+      throw new NotFoundException('booking not found');
+    }
+
+    await this.prisma.booking.update({
+      where: { id },
+      data: {
+        ...cancelBookingDetails,
+      },
+    });
+    return { msg: 'Booking canceled for ' + booking.booked_date };
   }
 
   async deleteBooking(id) {

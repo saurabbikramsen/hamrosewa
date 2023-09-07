@@ -51,8 +51,8 @@ export class UserService {
     });
     const bookings = user.booking.filter((booking) => {
       if (
-        booking.status == 'pending' ||
-        (booking.status == 'accepted' && booking.payment.status != 'Paid')
+        booking?.status == 'pending' ||
+        (booking?.status == 'accepted' && booking.payment?.status != 'Paid')
       ) {
         return booking;
       }
@@ -118,7 +118,7 @@ export class UserService {
         });
       }
       const passwordHash = await argon.hash(userDetails.password);
-      await this.prisma.user.create({
+      const create_user = await this.prisma.user.create({
         data: {
           name: userDetails.name,
           email: userDetails.email,
@@ -148,6 +148,8 @@ export class UserService {
         accessToken: accessToken,
         refreshToken: refreshToken,
         msg: `welcome ${userDetails.name}`,
+        user_id: create_user.id,
+        name: create_user.name,
       };
     } else {
       throw new BadRequestException('EMAIL ALREADY EXISTS');
@@ -190,7 +192,7 @@ export class UserService {
     };
   }
 
-  async deleteUser(id) {
+  async deleteUser(id: number) {
     const user = await this.prisma.user.findFirst({ where: { id } });
     if (!user) {
       throw new NotFoundException('user not found');

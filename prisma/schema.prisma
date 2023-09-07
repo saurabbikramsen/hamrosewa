@@ -60,6 +60,7 @@ model vendor {
   state             String
   city              String
   postal_code       String
+  image_url         String         @default("localhost:9000/hamrosewa/d82ef74fcc41ee18913c43610c5013ab.jpg")
   street            String
   description       String?        @db.VarChar(5000)
   number            String?

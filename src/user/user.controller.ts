@@ -45,7 +45,7 @@ export class UserController {
     return this.userService.loginUser(loginData);
   }
 
-  @Post('add')
+  @Post()
   @ApiResponse({ type: LoginResponseDto })
   addUser(@Body() userDto: UserDto) {
     return this.userService.addUser(userDto);

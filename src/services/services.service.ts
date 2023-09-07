@@ -55,7 +55,11 @@ export class ServicesService {
 
   async addService(serviceDetails: ServicesDto, serviceImage: BufferedFile) {
     try {
+      if (!serviceImage) {
+        throw new NotFoundException('Please provide the image');
+      }
       const image_url = await this.minio.upload(serviceImage);
+
       await this.prisma.services.create({
         data: { ...serviceDetails, image_url: image_url.url },
       });

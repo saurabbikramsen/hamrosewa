@@ -33,6 +33,14 @@ export class BookingsController {
   ) {
     return this.bookingService.acceptBooking(id, acceptBookingDto);
   }
+
+  @Patch('cancel/:id')
+  cancelBooking(
+    @Body() cancelBookingDto: AcceptBookingDto,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return this.bookingService.cancelBooking(id, cancelBookingDto);
+  }
   @Post()
   addBooking(@Body() bookingsDto: BookingsDto) {
     return this.bookingService.addBooking(bookingsDto);

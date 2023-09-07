@@ -8,6 +8,7 @@ import {
   Post,
   Put,
   Query,
+  UploadedFile,
   UseInterceptors,
   UsePipes,
 } from '@nestjs/common';
@@ -16,6 +17,8 @@ import { VendorDto } from './Dto';
 import { ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { ErrorHandlingPipes } from '../Pipes/lowerCasePipe';
 import { ResponseInspector } from '../interceptor/response_interceptor ';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { BufferedFile } from '../minio-client/file.model';
 
 @ApiTags('vendor')
 @Controller('vendor')
@@ -74,12 +77,23 @@ export class VendorController {
   ) {
     return this.vendorService.getVendorInfo(userId, vendorId);
   }
-  @Post('add')
-  @UsePipes(ErrorHandlingPipes)
-  addVendor(@Body() vendorDto: VendorDto) {
-    return this.vendorService.addVendor(vendorDto);
+
+  @Get('booking/:id')
+  getVendorBooking(@Param('id', ParseIntPipe) id: number) {
+    return this.vendorService.getVendorBookings(id);
   }
 
+  @Post()
+  @UsePipes(ErrorHandlingPipes)
+  @UseInterceptors(FileInterceptor('service_image'))
+  addVendor(@Body() vendorDto: VendorDto, @UploadedFile() image: BufferedFile) {
+    return this.vendorService.addVendor(vendorDto, image);
+  }
+
+  @Get('payment/:id')
+  getVendorPayment(@Param('id', ParseIntPipe) id: number) {
+    return this.vendorService.getVendorPayment(id);
+  }
   @Put('update/:id')
   @ApiParam({ name: 'id', type: 'number', description: 'Vendor Id' })
   @UsePipes(ErrorHandlingPipes)

@@ -19,10 +19,13 @@ export class PaymentController {
   }
 
   @Put('/:id')
-  updatePayment(
+  async updatePayment(
     @Body() paymentDto: PaymentDto,
     @Param('id', ParseIntPipe) id: number,
   ) {
-    return this.paymentService.updatePayment(id, paymentDto);
+    const payment = await this.paymentService.updatePayment(id, paymentDto);
+    if (payment) {
+      return { msg: 'Payment updated successfully' };
+    }
   }
 }

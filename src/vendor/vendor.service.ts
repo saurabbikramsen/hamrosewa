@@ -11,6 +11,8 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as argon from 'argon2';
 import { ClusterService } from '../cluster/cluster.service';
+import { BufferedFile } from '../minio-client/file.model';
+import { MinioClientService } from '../minio-client/minio-client.service';
 
 @Injectable()
 export class VendorService {
@@ -20,6 +22,7 @@ export class VendorService {
     private config: ConfigService,
     private cluster: ClusterService,
     private jwt: JwtService,
+    private minio: MinioClientService,
   ) {}
 
   async getVendorInfo(userId: number, vendorId: number) {
@@ -32,6 +35,38 @@ export class VendorService {
       where: { id: vendorId },
       data: { visited_frequency: vf },
     });
+  }
+
+  async getVendorPayment(id: number) {
+    console.log(id);
+    const vendor = await this.prisma.vendor.findFirst({
+      where: { id },
+      include: {
+        payment: { include: { booking: { include: { user: true } } } },
+      },
+    });
+    console.log(vendor.payment);
+    return vendor;
+  }
+  async getVendorBookings(id: number) {
+    const vendor = await this.prisma.vendor.findFirst({
+      where: { id },
+      include: {
+        booking: { include: { user: true, payment: true } },
+      },
+    });
+    console.log(vendor);
+    const bookings = vendor.booking.filter((booking) => {
+      if (
+        booking?.status == 'canceled' ||
+        booking?.status == 'pending' ||
+        (booking?.status == 'accepted' && booking.payment?.status != 'Paid')
+      ) {
+        return booking;
+      }
+    });
+    console.log(bookings);
+    return bookings;
   }
 
   async login(loginDetails: VendorLoginDto) {
@@ -76,8 +111,14 @@ export class VendorService {
     return this.prisma.vendor.findMany({ include: { location: true } });
   }
 
-  async addVendor(vendorDetails: VendorDto) {
+  async addVendor(vendorDetails: VendorDto, vendor_image: BufferedFile) {
     try {
+      let image_url = {
+        url: 'localhost:9000/hamrosewa/d82ef74fcc41ee18913c43610c5013ab.jpg',
+      };
+      if (vendor_image) {
+        image_url = await this.minio.upload(vendor_image);
+      }
       let location: any = {};
       const vendor = await this.prisma.vendor.findFirst({
         where: { email: vendorDetails.email },
@@ -111,6 +152,7 @@ export class VendorService {
             street: vendorDetails.street,
             password: hashPassword,
             state: vendorDetails.state,
+            image_url: image_url.url,
             city: vendorDetails.city,
             postal_code: vendorDetails.postal_code,
             number: vendorDetails.number,
@@ -134,6 +176,8 @@ export class VendorService {
           accessToken: accessToken,
           refreshToken: refreshToken,
           msg: `welcome ${vend.name}`,
+          vend: vend.name,
+          vendor_id: vend.id,
         };
       } else {
         throw new BadRequestException('Email already exists');
@@ -143,7 +187,7 @@ export class VendorService {
     }
   }
 
-  async updateVendor(id, vendorDetails: VendorDto) {
+  async updateVendor(id: number, vendorDetails: VendorDto) {
     const vendor = await this.prisma.vendor.findUnique({ where: { id } });
     if (!vendor) {
       throw new NotFoundException('vendor not found');
