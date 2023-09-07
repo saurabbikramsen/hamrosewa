@@ -25,6 +25,7 @@ export class VendorService {
     private minio: MinioClientService,
   ) {}
 
+  async getVendorsRecommendation() {}
   async getVendorInfo(userId: number, vendorId: number) {
     const vendor = await this.prisma.vendor.findUnique({
       where: { id: vendorId },

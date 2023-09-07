@@ -25,6 +25,10 @@ import { BufferedFile } from '../minio-client/file.model';
 export class VendorController {
   constructor(private vendorService: VendorService) {}
 
+  @Get('recommendations')
+  getVendorsRecommendation(): Promise<any> {
+    return this.vendorService.getVendorsRecommendation();
+  }
   @Get()
   @UseInterceptors(ResponseInspector)
   getVendors(): Promise<any> {
